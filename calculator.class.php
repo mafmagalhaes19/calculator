@@ -16,12 +16,25 @@
             $this->bonus = $bonus;
         }
 
-        function addCalculation(PDO $db){
+        static function computeCalculation(PDO $db, string $operation){
+            $operationArray = str_split($operation);
+            $newNumber="";
+
+            foreach($operationArray as $val){
+                $newNumber .= $val;
+                $aux = (float) $newNumber;
+            }
+            $result = $aux + 1;
+            return $result;
+        }
+
+        function addCalculation(PDO $db, string $ip, int $timestamp, string $operation, float $result, bool $bonus){
             $stmt = $db->prepare('
                 INSERT INTO Calculation (Ip, OperationTimestamp, Operation, Result, Bonus)
                 VALUES (?, ?, ?, ?, ?)
             ');
-            $stmt->execute(array($this->ip, $this->timestamp, $this->operation, $this->result, $this->bonus));
+            $stmt->execute([$ip, $timestamp, $operation, $result, $bonus]);
         }
+          
     }
 ?>
