@@ -43,12 +43,28 @@
 
                     $i += 2;
                 }
+                else if($currentChar == "("){
+                    $newOperation = "";
+
+                    for($j = $i; $j < strlen($operation); $j++){
+                        $currentChar = $operation[$j];
+                        if($currentChar != ")"){
+                            $newOperation .= $currentChar;
+                        }
+                        else {
+                            $number = self::computeCalculation($db, $newOperation);
+                            $allNumbers[] = $number;
+                            $i = $j;
+                            break;
+                        }
+                    }
+                }
                 else {
                     $currentNumber .= $currentChar;
                 }
             };
 
-            // the las number needs to be added into $allNumbers
+            // the last number needs to be added into $allNumbers
             if(strlen($currentNumber) > 0){
                 $number = (float) $currentNumber;
                 $allNumbers[] = $number;
