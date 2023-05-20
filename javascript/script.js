@@ -1,4 +1,3 @@
-
 function addInput(value){
     console.log(value)
     var screen = document.getElementById("screen");
@@ -15,7 +14,9 @@ function computeResult(){
     var operation = screen.value;
     if(operation.length > 0){
         (async () => {
-            const response = await fetch('../api/api_calculator.php?operation=' + operation)
+            // encode operation in order to send '+' encoded
+            const encodedOperation = encodeURIComponent(operation);
+            const response = await fetch('../api/api_calculator.php?operation=' + encodedOperation);
             const result = await response.json()
             screen.value = result
         })();
