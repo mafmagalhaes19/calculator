@@ -6,7 +6,7 @@
 
   require_once(__DIR__ . '/../calculator.class.php');
 
-  $result = Calculator::computeCalculation($db,$_GET['operation']);
+  $response = Calculator::computeCalculation($db,$_GET['operation']);
 
-  echo json_encode($result);
+  echo json_encode($response);
 ?>

@@ -7,9 +7,9 @@
 -- bonus       boolean/tinyint (nota: indicar se o resultado da operação acertou no número aleatório) 
 
 
-DROP TABLE IF EXISTS Calculation;
+DROP TABLE IF EXISTS Calculator;
 
-CREATE TABLE Calculation (
+CREATE TABLE Calculator (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Ip VARCHAR(15) NOT NULL,
     OperationTimestamp INTEGER NOT NULL,

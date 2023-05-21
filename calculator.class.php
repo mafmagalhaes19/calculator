@@ -2,20 +2,6 @@
     declare(strict_types = 1);
 
     class Calculator {
-        public string $ip;
-        public int $timestamp;
-        public string $operation;
-        public float $result;
-        public bool $bonus;
-
-        public function __construct(string $ip, int $timestamp, string $operation, float $result, bool $bonus){
-            $this->ip = $ip;
-            $this->timestamp = $timestamp;
-            $this->operation = $operation;
-            $this->result = $result;
-            $this->bonus = $bonus;
-        }
-
         static function computeCalculation(PDO $db, string $operation){
             $operators = ["+", "-", "*", "/"];
             $currentChar = "";
@@ -23,7 +9,7 @@
             $allNumbers = [];
             $allOperations = [];
 
-            // for loop through $operation in order to separate the numbers and the operators of the current calculation
+            // For loop through $operation in order to separate the numbers and the operators of the current calculation
             for($i = 0; $i < strlen($operation); $i++){
                 $currentChar = $operation[$i];
 
@@ -64,16 +50,48 @@
                 }
             };
 
-            // the last number needs to be added into $allNumbers
+            // The last number needs to be added into $allNumbers
             if(strlen($currentNumber) > 0){
                 $number = (float) $currentNumber;
                 $allNumbers[] = $number;
             }
 
+            // Compute final result of $operation
             $result = self::getFinalResult($allNumbers, $allOperations);
-            return $result;
+
+            // Get the server IP
+            $serverIP = gethostbyname($_SERVER['SERVER_NAME']);
+
+            // Get the current timestamp
+            $timestamp = time();
+ 
+            // Generate random number in order to check if there's bonus in the current operaation
+            $randomNumber = rand(1, 100);
+
+            // Bonus starts as false
+            $bonus = false;
+ 
+            // Check if there's bonus
+            if($result == $randomNumber){
+                $bonus = true;
+            }
+ 
+            // Add the current calculation into the database
+            self::addCalculation($db, $serverIP, $timestamp, $operation, $result, $bonus);
+ 
+            $response = array(
+                'result' => $result,
+                'randomNumber' => $randomNumber,
+                'bonus' => $bonus
+            );
+ 
+            // Encode the response as JSON
+            $jsonResponse = json_encode($response);
+
+            return $jsonResponse;
         }
 
+        // Computes the final result of the current calculation
         static function getFinalResult(array $allNumbers, array $allOperations){
             $result = $allNumbers[0];
             
@@ -103,13 +121,20 @@
             return $result;
         }
 
-        function addCalculation(PDO $db, string $ip, int $timestamp, string $operation, float $result, bool $bonus){
+        // Adds calculation to the database
+        static function addCalculation(PDO $db, string $ip, int $timestamp, string $operation, float $result, bool $bonus){
             $stmt = $db->prepare('
-                INSERT INTO Calculation (Ip, OperationTimestamp, Operation, Result, Bonus)
+                INSERT INTO Calculator (Ip, OperationTimestamp, Operation, Result, Bonus)
                 VALUES (?, ?, ?, ?, ?)
             ');
-            $stmt->execute([$ip, $timestamp, $operation, $result, $bonus]);
+
+            if($bonus){
+                $finalBonus = 1;
+            }
+            else {
+                $finalBonus = 0;
+            }
+            $stmt->execute([$ip, $timestamp, $operation, $result, $finalBonus]);
         }
-          
     }
 ?>

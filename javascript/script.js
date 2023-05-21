@@ -3,6 +3,7 @@ var isZero = false;
 var isFirstParentheses = false;
 var isSecondParentheses = false;
 var isError = false;
+var isBonus = false;
 
 var notNumbers = ["+", "-", "/", "*", "M", "(", ")", "MOD"];
 var operators = ["+", "-", "/", "*", "M", "D", "MOD"];
@@ -13,6 +14,11 @@ function addInput(value){
     if(isError){
         clearScreen();
         isError = false;
+    }
+
+    if(isBonus){
+        clearScreen();
+        isBonus = false;
     }
 
     checkBeginningError(value);
@@ -34,24 +40,35 @@ function clearScreen(){
 function computeResult(){
 
     if(isDivision && isZero){
-        console.log("ERROR -  DIVISION");
+        console.log("ERROR -  You can't divide a number by zero");
         isDivision = false;
         isZero = false;
         error();
         return;
     }
 
-    //todo : end error
+    checkEndingError();
 
     var screen = document.getElementById("screen");
     var operation = screen.value;
-    if(operation.length > 0){
+    if(operation.length > 0 && !isError){
         (async () => {
             // Encode operation in order to send '+' encoded
             const encodedOperation = encodeURIComponent(operation);
             const response = await fetch('../api/api_calculator.php?operation=' + encodedOperation);
-            const result = await response.json()
-            screen.value = result
+            const data = await response.json();
+            const { result, randomNumber, bonus } = JSON.parse(data);
+
+            if(bonus){
+                isBonus = true;
+                screen.value = result + " + BONUS :)";
+            }
+            else {
+                screen.value = result;
+            }
+            console.log("Result -> ", result);
+            console.log("Random number -> ", randomNumber)
+            console.log("Bonus -> ", bonus);
         })();
     }
 }
@@ -59,7 +76,7 @@ function computeResult(){
 function checkDivisionByZeroError(value){
      // There's an error if the user tries to do a division by zero
      if(isDivision && isZero && notNumbers.includes(value)){
-        console.log("ERROR - DIVISION");
+        console.log("ERROR - You can't divide a number by zero");
         isDivision = false;
         isZero = false;
         error();
@@ -68,7 +85,6 @@ function checkDivisionByZeroError(value){
 
     // Checks if the value is an operator and sets isDivision to true in case of it being a division
     if(value == "/"){
-        console.log("ISDIVISION")
         isDivision = true;
     }
     else if(notNumbers.includes(value)){
@@ -77,7 +93,6 @@ function checkDivisionByZeroError(value){
 
     // Checks if the value is a number and sets isZero to true in case of it being zero
     if(value == "0"){
-        console.log("ISZERO");
         isZero = true;
     }
     else if (!notNumbers.includes(value)){
@@ -155,7 +170,7 @@ function checkSecondParenthesesError(value){
     }  
 }
 
-
+// The beginning of the operation can't be an operator
 function checkBeginningError(value){
     var screen = document.getElementById("screen");
     var currentOperation = screen.value;
@@ -167,9 +182,21 @@ function checkBeginningError(value){
     }
 }
 
+// The ending of the operation can't be an operator
+function checkEndingError(){
+    var screen = document.getElementById("screen");
+    var currentOperation = screen.value;
+    var lastChar = currentOperation.charAt(currentOperation.length - 1);
+
+    if(operators.includes(lastChar)){
+        console.log("ERROR - Ending must be a number or parentheses");
+        error();
+        return;
+    }
+}
+
 
 function error(){
-    console.log("Inside error function");
     var screen = document.getElementById("screen");
     screen.value = "ERROR";
     isError = true;
