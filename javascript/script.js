@@ -5,7 +5,7 @@ var isSecondParentheses = false;
 var isError = false;
 
 var notNumbers = ["+", "-", "/", "*", "M", "(", ")", "MOD"];
-var operators = ["+", "-", "/", "*", "M", "D"];
+var operators = ["+", "-", "/", "*", "M", "D", "MOD"];
 
 function addInput(value){
     console.log(value)
@@ -15,12 +15,15 @@ function addInput(value){
         isError = false;
     }
 
+    checkBeginningError(value);
     checkDivisionByZeroError(value);
     checkFirstParenthesesError(value);
     checkSecondParenthesesError(value);
 
-    var screen = document.getElementById("screen");
-    screen.value += value;
+    if(!isError){
+        var screen = document.getElementById("screen");
+        screen.value += value; 
+    }
 }
 
 function clearScreen(){
@@ -37,6 +40,8 @@ function computeResult(){
         error();
         return;
     }
+
+    //todo : end error
 
     var screen = document.getElementById("screen");
     var operation = screen.value;
@@ -80,7 +85,7 @@ function checkDivisionByZeroError(value){
     }
 }
 
-// First parentheses must be at the beggining of the operation or have an operator on the left side and a number on the right side
+// First parentheses must be at the beginning of the operation or have an operator on the left side and a number on the right side
 // Example situations of first parentheses error:
 // number followed by first parentheses ->  1+2(2-1)
 // first parentheses followed by operator -> 1+2+(+1
@@ -90,7 +95,7 @@ function checkFirstParenthesesError(value){
 
     if(isFirstParentheses){
         // Right side constraint 
-        if(notNumbers.includes(value) || value == "."){
+        if(operators.includes(value) || value == "."){
             console.log("ERROR - First Parentheses must have a number on the right side");
             isFirstParentheses = false;
             error();
@@ -103,7 +108,7 @@ function checkFirstParenthesesError(value){
         isFirstParentheses = true;
 
         // Left side constraint
-        if(currentOperation.length != 0){
+        if(currentOperation.length > 0){
             var lastChar = currentOperation.charAt(currentOperation.length - 1);
             if(!operators.includes(lastChar)){
                 console.log("ERROR - First Parentheses must have an operator on the left side");
@@ -125,19 +130,6 @@ function checkSecondParenthesesError(value){
     var currentOperation = screen.value;    
     var lastChar = currentOperation.charAt(currentOperation.length - 1);
 
-
-    if(value == ")"){
-        isSecondParentheses = true;
-
-        // Left side constraint
-        if(currentOperation.length == 0 || notNumbers.includes(lastChar) || lastChar == "."){
-            console.log("ERROR - Second Parentheses must have a number on the left side");
-            isSecondParentheses = false;
-            error();
-            return;
-        }
-    }
-
     if(isSecondParentheses){
         // Right side constraint
         if(!operators.includes(value)){
@@ -148,7 +140,33 @@ function checkSecondParenthesesError(value){
         }
         isSecondParentheses = false;
     }
+
+
+    if(value == ")"){
+        isSecondParentheses = true;
+
+        // Left side constraint
+        if(currentOperation.length == 0 || operators.includes(lastChar) || lastChar == "."){
+            console.log("ERROR - Second Parentheses must have a number on the left side");
+            isSecondParentheses = false;
+            error();
+            return;
+        }
+    }  
 }
+
+
+function checkBeginningError(value){
+    var screen = document.getElementById("screen");
+    var currentOperation = screen.value;
+
+    if(currentOperation.length == 0 && operators.includes(value)){
+        console.log("ERROR - Beginning must be a number or parentheses");
+        error();
+        return;
+    }
+}
+
 
 function error(){
     console.log("Inside error function");
