@@ -35,6 +35,13 @@ function addInput(value){
 function clearScreen(){
     var screen = document.getElementById("screen");
     screen.value = "";
+
+    isDivision = false;
+    isZero = false;
+    isFirstParentheses = false;
+    isSecondParentheses = false;
+    isError = false;
+    isBonus = false;
 }
 
 function computeResult(){
@@ -200,4 +207,9 @@ function error(){
     var screen = document.getElementById("screen");
     screen.value = "ERROR";
     isError = true;
+
+    isDivision = false;
+    isZero = false;
+    isFirstParentheses = false;
+    isSecondParentheses = false;
 }

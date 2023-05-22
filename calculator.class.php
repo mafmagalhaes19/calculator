@@ -8,6 +8,7 @@
             $currentNumber="";
             $allNumbers = [];
             $allOperations = [];
+            $isNestedOperation = false;
 
             // For loop through $operation in order to separate the numbers and the operators of the current calculation
             for($i = 0; $i < strlen($operation); $i++){
@@ -16,17 +17,28 @@
                 if(in_array($currentChar, $operators)){
                     $allOperations[] = $currentChar;
 
-                    $number = (float) $currentNumber;
-                    $allNumbers[] = $number;
-                    $currentNumber = "";
+                    // Without this condition, after a nested operation we would add a 0 to the operation
+                    if(!$isNestedOperation){
+                        $number = (float) $currentNumber;
+                        $allNumbers[] = $number;
+                        $currentNumber = "";
+                    }
+                    else{
+                        $isNestedOperation = false;
+                    }
                 }
                 else if($currentChar == "M"){
                     $allOperations[] = "MOD";
 
-                    $number = (float) $currentNumber;
-                    $allNumbers[] = $number;
-                    $currentNumber = "";
-
+                    if(!$isNestedOperation){
+                        $number = (float) $currentNumber;
+                        $allNumbers[] = $number;
+                        $currentNumber = "";
+                    }
+                    else{
+                        $isNestedOperation = false;
+                    }
+                    
                     $i += 2;
                 }
                 else if($currentChar == "("){
@@ -38,9 +50,15 @@
                             $newOperation .= $currentChar;
                         }
                         else {
-                            $number = self::computeCalculation($db, $newOperation);
+                            // Calculate nested operation
+                            $jsonResult = self::computeCalculation($db, $newOperation);
+                            $auxResult = json_decode($jsonResult, true);
+
+                            $number = $auxResult['result'];
                             $allNumbers[] = $number;
+
                             $i = $j;
+                            $isNestedOperation = true;
                             break;
                         }
                     }
