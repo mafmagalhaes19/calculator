@@ -10,7 +10,7 @@ cd database
 sqlite3 database.db < database.sql
 cd ..
 ```
-2. Run php server.
+2. Run the php server.
 ```
 php -S localhost:8000
 ```
@@ -28,7 +28,7 @@ SELECT * FROM Calculator;
 
 # Notes
 - The calculator can evaluate expressions with parentheses and it takes into account the following rules:
-    - The first parantheses must have an operator on its left and a number on its right.
+    - The first parenthesis must have an operator on its left and a number on its right.
         - Example:
         ```
         (1+2) = 3 => VALID
@@ -36,7 +36,7 @@ SELECT * FROM Calculator;
         1+(MOD1) => ERROR
         1(2+3) => ERROR
         ```
-    - The second parantheses must have a number on its left and an operator on its right.
+    - The second parenthesis must have a number on its left and an operator on its right.
          - Example:
         ```
         (1+2) = 3 => VALID
