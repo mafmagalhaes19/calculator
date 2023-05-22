@@ -10,7 +10,7 @@ cd database
 sqlite3 database.db < database.sql
 cd ..
 ```
-2. Run php server.
+2. Run the php server.
 ```
 php -S localhost:8000
 ```
